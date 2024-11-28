@@ -1,3 +1,5 @@
 venv/
+.venv/
 Dockerfile
 google-cloud-sdk/
+__pycache__/

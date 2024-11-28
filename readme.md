@@ -38,3 +38,8 @@ app.py: The main Flask application file.
 math_helper.py: The helper class for arithmetic operations.
 requirements.txt: The file listing the dependencies for the Flask application.
 Dockerfile: The Dockerfile for containerizing the Flask application.
+
+# venv
+python3.7 -m venv .venv
+
+source .venv/bin/activate
