@@ -1,10 +1,15 @@
 from flask import Flask, request, jsonify
+from iterations_helper import IterationsHelper
 from mathhelper import MathHelper
 from csv_helper import CSVHelper
-
+from string_helper import StringHelper
+from buffer_helper import Buffer
 import pandas as pd
 
 app = Flask(__name__)
+
+# Create a Buffer instance
+buffer = Buffer()
 
 @app.route('/')
 def hello_world():
@@ -14,6 +19,16 @@ def hello_world():
 def greet():
     name = request.args.get('name', 'User')
     return f'Hello, {name}!'
+
+@app.route('/for_loop', methods=['GET'])
+def for_loop():
+    try:
+        start = int(request.args.get('start', 1))
+        end = int(request.args.get('end', 10))
+        result = IterationsHelper.for_loop(start, end)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 @app.route('/read_write_csv', methods=['GET'])
 def read_csv():
@@ -66,6 +81,86 @@ def arithmetic():
             return jsonify({'error': 'Invalid operation'}), 400
 
         return jsonify({'result': result}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 
+        
+@app.route('/string_manipulation', methods=['POST'])
+def string_manipulation():
+    try:
+        data = request.get_json()
+        if not data or 'string' not in data or 'operation' not in data:
+            return jsonify({'error': 'Invalid JSON input'}), 400
+        
+        s = data['string']
+        operation = data['operation']
+        
+        if operation == 'uppercase':
+            result = StringHelper.to_uppercase(s)
+        elif operation == 'lowercase':
+            result = StringHelper.to_lowercase(s)
+        elif operation == 'reverse':
+            result = StringHelper.reverse_string(s)
+        elif operation == 'capitalize':
+            result = StringHelper.capitalize_string(s)
+        else:
+            return jsonify({'error': 'Invalid operation'}), 400
+        
+        return jsonify({'result': result}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# buffer routes
+@app.route('/buffer/add', methods=['POST'])
+def buffer_add():
+    try:
+        data = request.get_json()
+        item = data['item']
+        buffer.add(item)
+        return jsonify({'message': 'Item added to buffer'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/buffer/get_all', methods=['GET'])
+def buffer_get_all():
+    try:
+        items = buffer.get_all()
+        return jsonify(items), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/buffer/clear', methods=['POST'])
+def buffer_clear():
+    try:
+        buffer.clear()
+        return jsonify({'message': 'Buffer cleared'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/buffer/get_by_type', methods=['GET'])
+def buffer_get_by_type():
+    try:
+        data_type = request.args.get('type')
+        if data_type == 'int':
+            items = buffer.get_by_type(int)
+        elif data_type == 'str':
+            items = buffer.get_by_type(str)
+        elif data_type == 'float':
+            items = buffer.get_by_type(float)
+        elif data_type == 'bool':
+            items = buffer.get_by_type(bool)
+        else:
+            return jsonify({'error': 'Invalid type'}), 400
+        return jsonify(items), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# fibonacci route
+@app.route('/fibonacci', methods=['GET'])
+def fibonacci():
+    try:
+        n = int(request.args.get('n', 10))
+        result = IterationsHelper.fibonacci(n)
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
