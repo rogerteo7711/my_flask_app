@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify
 from mathhelper import MathHelper
+from csv_helper import CSVHelper
+
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -11,6 +14,19 @@ def hello_world():
 def greet():
     name = request.args.get('name', 'User')
     return f'Hello, {name}!'
+
+@app.route('/read_write_csv', methods=['GET'])
+def read_csv():
+    # read csv contents to pandas dataframe
+    df_csv_contents = CSVHelper.read_csv_to_dataframe('./csv/read_csv.csv')
+
+    # Change the name to "Roger Teo"
+    df_csv_contents.loc[df_csv_contents['name'] == 'john smith', 'name'] = 'Roger Teo'
+
+    # Write the modified DataFrame back to CSV
+    CSVHelper.write_dataframe_to_csv(df_csv_contents, './csv/read_csv_modified.csv')
+
+    return jsonify(df_csv_contents.to_dict())
 
 @app.route('/greet', methods=['POST'])
 def greet_post():

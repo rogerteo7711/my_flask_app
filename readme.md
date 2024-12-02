@@ -43,3 +43,5 @@ Dockerfile: The Dockerfile for containerizing the Flask application.
 python3.7 -m venv .venv
 
 source .venv/bin/activate
+
+pip install --upgrade pip
